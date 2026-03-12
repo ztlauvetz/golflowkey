@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>75-Day Golf Training Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a1a;
+  --paper: #f7f3ec;
+  --paper-dark: #ece7dc;
+  --gold: #b5862a;
+  --gold-light: #d4a84b;
+  --green: #2e5e3e;
+  --green-light: #3d7a52;
+  --rust: #b84a2e;
+  --blue: #2a4e7a;
+  --blue-light: #4a7ab8;
+  --muted: #7a7060;
+  --border: #d8d0c0;
+  --shadow: rgba(26,26,26,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  padding: 32px 40px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.header-left {}
+.header-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+}
+.header-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: clamp(22px, 4vw, 36px);
+  color: var(--paper);
+  font-weight: 700;
+  line-height: 1.1;
+}
+.header-title em { color: var(--gold-light); font-style: italic; }
+.header-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: #aaa;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.5px;
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── PHASE BAR ── */
+.phase-bar {
+  display: flex;
+  background: #2a2a2a;
+  border-bottom: 1px solid #3a3a3a;
+}
+.phase-seg {
+  flex: 1;
+  padding: 10px 16px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.phase-seg.p1 { color: var(--blue-light); border-right: 1px solid #3a3a3a; }
+.phase-seg.p2 { color: var(--green-light); border-right: 1px solid #3a3a3a; }
+.phase-seg.p3 { color: var(--gold-light); }
+.phase-seg span { display: block; color: #666; font-size: 9px; margin-top: 2px; letter-spacing: 1px; }
+
+/* ── CALENDAR WRAPPER ── */
+.cal-wrapper {
+  padding: 28px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.week-label-row {
+  display: grid;
+  grid-template-columns: 48px repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.dow-label {
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 0;
+}
+.week-row {
+  display: grid;
+  grid-template-columns: 48px repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.week-num-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ── DAY CELL ── */
+.day-cell {
+  border-radius: 8px;
+  padding: 10px 10px 8px;
+  min-height: 72px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  border: 1.5px solid transparent;
+  background: var(--paper-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.day-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow);
+  border-color: rgba(181,134,42,0.3);
+}
+.day-cell.rest {
+  background: var(--paper-dark);
+  opacity: 0.55;
+  cursor: default;
+}
+.day-cell.rest:hover { transform: none; box-shadow: none; border-color: transparent; }
+.day-cell.gym-push { background: #eaf0f7; border-color: rgba(42,78,122,0.15); }
+.day-cell.gym-pull { background: #e8f0fb; border-color: rgba(42,78,122,0.12); }
+.day-cell.gym-full { background: #e4edf8; border-color: rgba(42,78,122,0.18); }
+.day-cell.range { background: #fdf6e8; border-color: rgba(181,134,42,0.2); }
+.day-cell.round { background: #e8f4ec; border-color: rgba(46,94,62,0.25); }
+.day-cell.chip { background: #fef0ea; border-color: rgba(184,74,46,0.15); }
+.day-cell.putt { background: #f0eaf8; border-color: rgba(100,60,160,0.15); }
+.day-cell.nine { background: #edf8f0; border-color: rgba(46,94,62,0.18); }
+
+.day-num {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+.day-cell.rest .day-num { color: var(--muted); }
+.day-type-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.day-cell.gym-push .day-type-label,
+.day-cell.gym-pull .day-type-label,
+.day-cell.gym-full .day-type-label { color: var(--blue); }
+.day-cell.range .day-type-label { color: var(--gold); }
+.day-cell.round .day-type-label { color: var(--green); }
+.day-cell.chip .day-type-label { color: var(--rust); }
+.day-cell.putt .day-type-label { color: #6e3fa3; }
+.day-cell.nine .day-type-label { color: var(--green-light); }
+
+.day-icon { font-size: 16px; position: absolute; bottom: 8px; right: 10px; opacity: 0.6; }
+.day-cell.past { opacity: 0.45; }
+.day-cell.today { border-color: var(--gold) !important; box-shadow: 0 0 0 2px rgba(181,134,42,0.2); }
+.today-dot {
+  position: absolute;
+  top: 6px; right: 8px;
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+/* ── DONE CHECKMARK ON CELL ── */
+.day-cell.done::after {
+  content: '✓';
+  position: absolute;
+  top: 5px; left: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1;
+}
+.day-cell.done { opacity: 1 !important; }
+.day-cell.done .day-num { color: var(--muted); }
+
+/* ── PROGRESS BAR ── */
+.progress-bar-wrap {
+  background: #2a2a2a;
+  padding: 12px 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888;
+  white-space: nowrap;
+}
+.progress-track {
+  flex: 1;
+  height: 4px;
+  background: #3a3a3a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-light), var(--green-light), var(--gold));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.progress-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--gold-light);
+  white-space: nowrap;
+}
+
+/* ── MODAL TRACKING SECTION ── */
+.modal-track {
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+  background: #faf7f2;
+  border-radius: 0 0 16px 16px;
+}
+.track-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.btn-done {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1.5px solid var(--green);
+  background: none;
+  color: var(--green);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.btn-done:hover { background: var(--green); color: white; }
+.btn-done.marked { background: var(--green); color: white; }
+.btn-clear {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.btn-clear:hover { border-color: var(--rust); color: var(--rust); }
+.notes-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.notes-field {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  resize: vertical;
+  line-height: 1.6;
+  transition: border-color 0.15s;
+}
+.notes-field:focus { outline: none; border-color: var(--gold); }
+.notes-field::placeholder { color: #bbb; }
+.notes-saved {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--green-light);
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  margin-top: 4px;
+}
+.notes-saved.show { opacity: 1; }
+
+/* ── MODAL OVERLAY ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,26,26,0.55);
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--paper);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.modal-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.modal-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.modal-phase {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+.modal-close:hover { color: var(--ink); }
+
+.modal-body { padding: 24px 28px 28px; }
+
+/* BLOCKS inside modal */
+.m-block {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  border-left: 3px solid var(--border);
+}
+.m-block.warm { border-left-color: var(--gold-light); background: #fffaf0; }
+.m-block.push { border-left-color: var(--blue); background: #f4f7fc; }
+.m-block.pull { border-left-color: var(--blue-light); background: #f2f6fc; }
+.m-block.cardio { border-left-color: var(--green-light); background: #f2f8f4; }
+.m-block.drill { border-left-color: var(--rust); background: #fdf5f2; }
+.m-block.toptracer { border-left-color: var(--gold); background: #fdf8ee; }
+.m-block.course { border-left-color: var(--green); background: #f0f8f2; }
+.m-block.focus { border-left-color: #6e3fa3; background: #f7f2fc; }
+
+.m-block-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.m-block-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.m-block-body {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #3a3a3a;
+}
+.m-block-body ul { padding-left: 16px; display: flex; flex-direction: column; gap: 4px; }
+.m-block-body li { line-height: 1.6; }
+.m-block-body strong { font-weight: 600; color: var(--ink); }
+
+.exercise-row {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  align-items: flex-start;
+}
+.exercise-row:last-child { border-bottom: none; }
+.ex-sets {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--blue);
+  flex-shrink: 0;
+  width: 52px;
+  padding-top: 1px;
+  font-weight: 500;
+}
+.ex-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.ex-note { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.time-tag {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  background: rgba(0,0,0,0.06);
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.m-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+@media (max-width: 640px) {
+  .header { padding: 24px 16px 20px; }
+  .cal-wrapper { padding: 16px 10px; }
+  .day-cell { min-height: 56px; padding: 7px 7px 6px; }
+  .day-num { font-size: 13px; }
+  .day-type-label { font-size: 8px; }
+  .day-icon { font-size: 13px; }
+  .modal-body, .modal-header { padding: 18px 18px; }
+  .week-num-cell { font-size: 9px; }
+  .phase-bar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-eyebrow">March 12 – May 25, 2026</div>
+    <h1 class="header-title">75-Day Golf<br>Training <em>Calendar</em></h1>
+  </div>
+  <div class="header-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#2a4e7a"></div>Push Day</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4a7ab8"></div>Pull Day</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3d6090"></div>Full Gym</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#b5862a"></div>Range</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2e5e3e"></div>Full Round</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3d7a52"></div>9-Hole</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#b84a2e"></div>Chip/Wedge</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6e3fa3"></div>Putting</div>
+  </div>
+</div>
+
+<div class="phase-bar">
+  <div class="phase-seg p1">Phase 1 — Foundation<span>Weeks 1–3 · Mar 12 – Apr 1</span></div>
+  <div class="phase-seg p2">Phase 2 — Development<span>Weeks 4–7 · Apr 2 – Apr 29</span></div>
+  <div class="phase-seg p3">Phase 3 — Peak & Sharpen<span>Weeks 8–10 · Apr 30 – May 25</span></div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-label">Progress</div>
+  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="progress-count" id="prog-count">0 / 0 sessions</div>
+</div>
+
+<div class="cal-wrapper">
+  <div class="week-label-row">
+    <div></div>
+    <div class="dow-label">Sun</div>
+    <div class="dow-label">Mon</div>
+    <div class="dow-label">Tue</div>
+    <div class="dow-label">Wed</div>
+    <div class="dow-label">Thu</div>
+    <div class="dow-label">Fri</div>
+    <div class="dow-label">Sat</div>
+  </div>
+  <div id="cal-grid"></div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-date" id="m-date"></div>
+        <div class="modal-title" id="m-title"></div>
+        <div class="modal-phase" id="m-phase"></div>
+      </div>
+      <button class="modal-close" onclick="closeOverlay()">✕</button>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+    <div class="modal-track" id="m-track">
+      <div class="track-row">
+        <button class="btn-done" id="btn-done" onclick="toggleDone()">✓ Mark Complete</button>
+        <button class="btn-clear" id="btn-clear" onclick="clearDay()" title="Clear this day's data">✕</button>
+      </div>
+      <div class="notes-label">Notes / Changes</div>
+      <textarea class="notes-field" id="notes-field" placeholder="What did you actually do? Any substitutions, how you felt, what to focus on next…" oninput="saveNotes()"></textarea>
+      <div class="notes-saved" id="notes-saved">Saved</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const START = new Date('2026-03-12');
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+
+// ── DATA DEFINITIONS ──
+
+const MOBILITY_WARMUP = `
+<div class="m-block warm">
+  <div class="m-block-label">Always First · 10 min</div>
+  <div class="m-block-title">Mobility Warm-Up</div>
+  <div class="m-block-body"><ul>
+    <li><strong>90/90 Hip Stretch</strong> — 60 sec each side</li>
+    <li><strong>Lying Windshield Wipers</strong> — 10 reps each side</li>
+    <li><strong>Thoracic Spine Rotations</strong> — 10 each side</li>
+    <li><strong>Half-Kneeling Hip Flexor + Reach</strong> — 45 sec each side</li>
+    <li><strong>Cat-Cow</strong> — 10 slow reps</li>
+  </ul></div>
+</div>`;
+
+const CARDIO_BLOCK = `
+<div class="m-block cardio">
+  <div class="m-block-label">End of Session · 20 min</div>
+  <div class="m-block-title">Cardio Finisher</div>
+  <div class="m-block-body">Incline treadmill walk, stationary bike, or row at moderate effort. This is your back-9 insurance — golf is 5 hours of walking with explosive bursts. Keep heart rate 130–150bpm. Not optional.</div>
+</div>`;
+
+// GYM SESSIONS by phase (1-3) and type (push/pull/full)
+function gymContent(phase, type, weekNum) {
+  const phaseLabel = ['Foundation (Wks 1–3)', 'Development (Wks 4–7)', 'Peak Power (Wks 8–10)'][phase-1];
+  const phaseColor = [' style="color:var(--blue-light)"', ' style="color:var(--green-light)"', ' style="color:var(--gold-light)"'][phase-1];
+
+  let pushExercises, pullExercises, fullExercises;
+
+  if (phase === 1) {
+    pushExercises = [
+      ['3×10', 'Dumbbell Bench Press', 'Controlled tempo — 3 sec down, 1 sec up. Foundation chest strength. Keep shoulder blades pinched together throughout.'],
+      ['3×12', 'Incline DB Press', 'Hits upper chest. Keep elbows at 45° to body, not flared out.'],
+      ['3×12', 'DB Lateral Raise', 'Slow and controlled. No momentum. Builds shoulder stability essential for the takeaway.'],
+      ['3×10', 'Overhead DB Press (seated)', 'Seated keeps your lower back safe. Full range — lower to ear height.'],
+      ['3×12', 'Tricep Pushdown (cable/band)', 'Elbows glued to sides. Full extension at the bottom.'],
+      ['3×10', 'Pallof Press', 'Core stability — resist rotation. 12 reps each side. This is golf-specific.'],
+      ['3×10', 'Bird Dog', '10 reps each side. Spinal stability.'],
+    ];
+    pullExercises = [
+      ['3×10', 'Dumbbell Row (single arm)', 'Elbow tracks back and up toward hip. Squeeze lat at top. Controls your downswing depth.'],
+      ['3×10', 'Lat Pulldown (machine/cable)', 'Full range — arms fully extended at top. Pull bar to upper chest.'],
+      ['3×12', 'Seated Cable Row', 'Neutral grip. Chest up, pull elbows to ribs. Full stretch at the start.'],
+      ['3×12', 'Face Pull (cable/band)', 'Pull to face level, elbows high. External rotation. Bulletproofs the rotator cuff.'],
+      ['3×12', 'Hammer Curl', 'Neutral grip builds both bicep and forearm. Forearm strength stabilizes the club.'],
+      ['3×10', 'Lateral Band Walk', '20 steps each direction. Glute stability for hip drive.'],
+      ['3×10', 'Dead Bug', '8 reps each side. Core without spinal flexion.'],
+    ];
+  } else if (phase === 2) {
+    pushExercises = [
+      ['3×8', 'Barbell or DB Bench Press', 'Add weight from Phase 1. Focus on explosive concentric — controlled on the way down, fast on the way up.'],
+      ['3×10', 'Arnold Press', 'Rotational shoulder press that builds the full deltoid and mimics rotational movement.'],
+      ['3×12', 'Cable Chest Fly', 'Full stretch at the start. Squeezes the chest through the full ROM.'],
+      ['3×10', 'Overhead Tricep Extension (cable)', 'Long head of tricep. Elbows pointed at ceiling, full range.'],
+      ['3×10', 'Lateral Raise (21s)', '7 reps bottom to mid, 7 reps mid to top, 7 full reps. Shoulder endurance and burn.'],
+      ['3×10', 'Cable Chop (High to Low)', '10 reps each side. The most golf-specific exercise that exists. Mirrors downswing force pattern.'],
+      ['3×10', 'Cable Chop (Low to High)', '10 reps each side. Follow-through pattern.'],
+    ];
+    pullExercises = [
+      ['3×8', 'Pull-Up or Assisted Pull-Up', 'Full hang at bottom, chin over bar at top. Builds the lat that controls downswing depth.'],
+      ['3×10', 'Chest-Supported DB Row', 'Lie chest-down on incline bench. Removes lower back from the equation — pure lat and upper back.'],
+      ['3×12', 'Cable Face Pull', 'Elbows high, external rotation at the end. Posture and rotator cuff.'],
+      ['3×10', 'EZ Bar Curl', 'Controlled tempo. Full extension at the bottom.'],
+      ['3×10', 'Reverse Curl', 'Overhand grip on a barbell. Builds forearm extensors and grip.'],
+      ['3×6', 'Med Ball Rotational Wall Throw', '6 throws each side, explosive. First real power work.'],
+      ['3×10', 'Bulgarian Split Squat', '10 reps each leg. Rear foot elevated. Lower body power transfer.'],
+    ];
+  } else {
+    pushExercises = [
+      ['3×6', 'Landmine Press (rotational)', 'Stand perpendicular to anchored bar, press in a rotational arc. The best golf-specific push movement.'],
+      ['4×8', 'Incline Barbell Press', 'Heavier than Phase 2. Explosive concentric. Builds overall pressing power.'],
+      ['3×10', 'Single-Arm Cable Press', 'One arm at a time. Forces rotational stability — core has to resist twist.'],
+      ['3×12', 'Overhead Tricep Extension', 'Heavier weight. Full lockout.'],
+      ['3×10', 'DB Lateral Raise — Drop Set', '3 sets, each set drop the weight after failure and continue to 12.'],
+      ['3×8', 'Landmine Rotational Press', '8 reps each side. Pivot-and-fire pattern under load. The peak gym exercise.'],
+      ['3×5', 'Med Ball Slam with Rotation', '5 reps each side. Full-body explosive power. Ground to finish.'],
+    ];
+    pullExercises = [
+      ['4×8', 'Weighted Pull-Up or Heavy Lat Pulldown', 'Add load. This is your peak pulling strength session.'],
+      ['3×10', 'Single-Arm DB Row — heavy', 'Squeeze and hold for 1 second at the top. This is the lat that controls your swing plane.'],
+      ['3×10', 'Seated Cable Row — wide grip', 'Wide grip hits rear deltoid and upper back. Posture for 18 holes.'],
+      ['3×12', 'Face Pull', 'Rotator cuff health. Never skip this, especially in the heavy phase.'],
+      ['3×10', 'Hammer Curl + Twist at Top', 'Supinate at the top to hit both heads of the bicep. Forearm stability.'],
+      ['3×5', 'Explosive Lateral Bound', '5 each side. Stick the landing. This is your weight-shift power training.'],
+      ['3×8', 'Goblet Squat with Rotation', 'Hip mobility under load. Squat, rotate at bottom, stand.'],
+    ];
+  }
+
+  // Full gym = core/lower body focus
+  fullExercises = phase === 1 ? [
+    ['3×10', 'Goblet Squat', 'Dumbbell at chest. Full depth. Builds hip mobility under load.'],
+    ['3×10', 'Single-Leg RDL', '10 each leg. Posterior chain and balance for the follow-through.'],
+    ['3×20', 'Lateral Band Walk', '20 steps each direction in quarter squat.'],
+    ['3×10', 'Pallof Press', '12 reps each side. Anti-rotation core stability.'],
+    ['3×8', 'Dead Bug', '8 each side. Slow and controlled.'],
+  ] : phase === 2 ? [
+    ['3×10', 'Bulgarian Split Squat', '10 each leg. Add dumbbells. Power transfer for the swing.'],
+    ['3×6', 'Med Ball Rotational Wall Throw', '6 each side, explosive.'],
+    ['3×10', 'Cable Chop (High to Low)', '10 each side.'],
+    ['3×10', 'Pallof Press', '12 reps each side, heavier band.'],
+    ['3×12', 'Lateral Raise', 'Shoulder stability and endurance.'],
+  ] : [
+    ['3×5', 'Explosive Lateral Bound', 'Stick the landing each side.'],
+    ['3×8', 'Landmine Rotational Press', '8 each side. Peak rotational power.'],
+    ['3×5', 'Med Ball Slam with Rotation', '5 each side.'],
+    ['3×10', 'Single-Arm DB Row', 'Heavy. Lat for downswing depth.'],
+    ['3×10', 'Single-Leg RDL', '10 each leg. Balance and posterior chain.'],
+  ];
+
+  function exRows(arr) {
+    return arr.map(([sets, name, note]) => `
+      <div class="exercise-row">
+        <div class="ex-sets">${sets}</div>
+        <div><div class="ex-name">${name}</div><div class="ex-note">${note}</div></div>
+      </div>`).join('');
+  }
+
+  if (type === 'gym-push') {
+    return MOBILITY_WARMUP + `
+    <div class="m-block push">
+      <div class="m-block-label">Push Day · ${phaseLabel}</div>
+      <div class="m-block-title">Chest, Shoulders & Triceps</div>
+      <div class="m-block-body">${exRows(pushExercises)}</div>
+    </div>` + CARDIO_BLOCK;
+  } else if (type === 'gym-pull') {
+    return MOBILITY_WARMUP + `
+    <div class="m-block pull">
+      <div class="m-block-label">Pull Day · ${phaseLabel}</div>
+      <div class="m-block-title">Back, Biceps & Rotational Power</div>
+      <div class="m-block-body">${exRows(pullExercises)}</div>
+    </div>` + CARDIO_BLOCK;
+  } else {
+    return MOBILITY_WARMUP + `
+    <div class="m-block push">
+      <div class="m-block-label">Full Body · ${phaseLabel}</div>
+      <div class="m-block-title">Core, Legs & Power</div>
+      <div class="m-block-body">${exRows(fullExercises)}</div>
+    </div>` + CARDIO_BLOCK;
+  }
+}
+
+// RANGE SESSIONS — 8 rotating types
+const rangeSessions = [
+  {
+    name: 'Baseline — T30 Assessment',
+    tag: 'Toptracer T30 Required',
+    blocks: [
+      ['warm','0–10 min','Wedge Warm-Up','PW ladder: 25 → 50 → 75 → 100 yards. One ball each yardage, cycling up and back. No mechanics — just feel the face and the distance.'],
+      ['toptracer','10–40 min','Toptracer T30','Run the full 30-shot protocol: 9 drives + 21 approach shots across all distance brackets. Don\'t try to hit perfect — this is your honest baseline. Screenshot your handicap impact data. These three numbers are your north star for the whole program.'],
+      ['drill','40–55 min','Harmon Pump Drill (7-iron)','Swing to the top, pause halfway down, return to top, halfway again, then finish. 15 reps. Teaches your lower body to lead before the arms fire. Hit 10 normal balls feeling that same sequence.'],
+      ['toptracer','55–75 min','Driver: Shape Commitment','Decide today — fade or draw. Hit 15 drivers with your chosen shape as the goal. Record your average carry and dominant miss direction in Toptracer.']
+    ]
+  },
+  {
+    name: 'Driver Deep Dive',
+    tag: 'Weeks 1–3',
+    blocks: [
+      ['warm','0–10 min','Warm-Up: PW + 9-iron','Ladder 80-100-120 with PW, then 130-145-160 with 9-iron. One ball each.'],
+      ['drill','10–25 min','Foley Towel Drill','Tuck a towel under both armpits. Make driver swings without dropping it. 15 balls with towel, 10 without it keeping the same connected feeling.'],
+      ['drill','25–45 min','Fairway Finder Drill','Imagine 30-yard-wide fairway. Hit 10 drivers. Count fairways hit. Write the number down — this is your Week 1 fairway percentage. Track it every session.'],
+      ['drill','45–60 min','Harmon Lead-Hand Impact Drill (7-iron)','Focus on keeping the back of your lead hand facing the target at impact, shaft slightly forward. Hands ahead, not flipped. 15 balls, full routine each.']
+    ]
+  },
+  {
+    name: 'Iron Fundamentals',
+    tag: 'Weeks 2–4',
+    blocks: [
+      ['warm','0–10 min','Divot Reading Warm-Up','10 balls with 9-iron at 70% effort. Watch only your divot direction — it should point at your target. If divots go left, your path is out-to-in. If right, in-to-out. Harmon says: read your divots and you don\'t need a mirror.'],
+      ['drill','10–30 min','Divot Line Drill (8-iron)','Scratch a line in the turf. Ball on the line. Goal: divot starts at or just past the line. This is low-point control — the single most important mechanical skill for consistent iron contact. 20 balls.'],
+      ['drill','30–50 min','Random Iron Ladder','Max 3 balls per club. Sequence: PW → 7i → 9i → 6i → GW → 8i. Different target every shot. No do-overs. Random practice feels hard — that\'s your brain actually learning.'],
+      ['toptracer','50–65 min','Driver: Closest to Pin','Toptracer competitive mode. 10 drives scored by proximity. Pre-shot routine every shot. Track your best proximity score.']
+    ]
+  },
+  {
+    name: 'Full Bag Random',
+    tag: 'Weeks 4–6 · Foley Method',
+    blocks: [
+      ['warm','0–10 min','Warm-Up: 3 Clubs','PW, 7-iron, driver — 5 balls each. What\'s your ball flight telling you today?'],
+      ['drill','10–45 min','Foley\'s Full Bag Randomizer','One ball per shot, every club and target different. Sequence: Driver → PW (punch low) → 7i (draw) → 9i (high fade) → Hybrid → GW (bump) → 6i → Driver → 8i. Full pre-shot routine every swing. Hit it, evaluate, move on. No do-overs.'],
+      ['toptracer','45–65 min','Toptracer Virtual Course','Play one simulated course, full round. All clubs as needed. Full routine. Track which clubs gave you the most trouble — that\'s next session\'s priority.']
+    ]
+  },
+  {
+    name: 'Wedge Matrix Session',
+    tag: 'Weeks 5–7 · Pelz Clock System',
+    blocks: [
+      ['warm','0–10 min','Driver Warm-Up','10 balls, go-to shape, full routine every swing. No mechanics. See it, feel it, hit it.'],
+      ['drill','10–40 min','Build Your Wedge Matrix','With gap wedge AND sand wedge, hit 5 balls at each clock position: 7:00 arm (carry ≈ ?), 9:00 arm (carry ≈ ?), 11:00 arm (carry ≈ ?). Note each carry distance. You now have 6 distances between 25–90 yards you can execute on command. Write these in your Grint notes. On the course, you pick the clock, not the effort.'],
+      ['drill','40–65 min','Iron Accuracy Focus','Your weakest Grint GIR iron gets 20 focused balls today. Full routine each shot. After 20: what\'s your average miss — long/short, left/right? Hit 10 more compensating for that pattern.']
+    ]
+  },
+  {
+    name: 'Course Management Simulation',
+    tag: 'Weeks 6–8',
+    blocks: [
+      ['warm','0–15 min','Harmon Barefoot/Sock Drill','Remove shoes (or stay in socks). Hit 10 iron shots. Your feet feel the ground and your brain automatically improves the weight shift. Put shoes back on — the sequencing transfers.'],
+      ['drill','15–50 min','Play a Course From Memory','Pick a KC-area course you know. Hole by hole, make real decisions: which side to miss on, play to fat of green not the pin, lay up to your wedge number. Use Toptracer Virtual Course. Track penalty shots. Harmon\'s rule: know where the miss needs to be before you swing.'],
+      ['drill','50–65 min','Driver Pressure Finish','10 drivers, full routine, fairway finder scoring. Compare to your Session 2 number. If it\'s up, the gym and range work is compounding.']
+    ]
+  },
+  {
+    name: 'Speed & Distance',
+    tag: 'Weeks 7–9 · Power Phase',
+    blocks: [
+      ['warm','0–10 min','Slow-Motion Sequencing','5 swings with 9-iron, 5 with driver, quarter speed. Feel: hips → torso → arms → club. Harmon: once your body knows the sequence, speed takes care of itself.'],
+      ['drill','10–30 min','Driver Speed Protocol','15 drivers at 3 effort levels: 80% (focused on contact), 90% (more turn), 100% (controlled aggression). On Toptracer, note ball speed at each level. Find the sweet spot where effort adds ball speed without losing contact.'],
+      ['drill','30–55 min','Odd-Iron Focus: 5i, 7i, 9i','10 balls each, different target every shot. Lead with the lower body, trust the arms to follow. Smooth over powerful.'],
+      ['toptracer','55–65 min','T30 Mid-Check (optional)','If time permits, run a short version and compare strokes-gained data to Session 1.']
+    ]
+  },
+  {
+    name: 'Pre-Trip Sharpener',
+    tag: 'Weeks 9–10 · Peak',
+    blocks: [
+      ['warm','0–10 min','Routine-Only Warm-Up','10 balls, PW, full pre-shot routine on every single shot. If you rush the warm-up, you\'ll rush the round. Lock this in.'],
+      ['toptracer','10–45 min','Toptracer T30 — Final Assessment','Full 30-shot protocol. Compare your handicap impact data directly to Session 1. This is your proof of work. Screenshot everything.'],
+      ['toptracer','45–65 min','Simulated Course Only','Virtual Course on Toptracer. Full routine every shot. One ball. No mulligans. This is your dress rehearsal. After this, there\'s only the trip.']
+    ]
+  }
+];
+
+// CHIP sessions — alternating distance sets
+const chipSessions = [
+  {
+    name: 'Wedge Session — 40 / 60 / 80 / 100 Yards',
+    tag: 'Short Game · Distance Control',
+    distances: [40, 60, 80, 100],
+    drills: [
+      ['drill','0–15 min','Pelz Clock System — Build Your Matrix','With gap wedge: find the clock position (7, 9, or 11 o\'clock) that produces each distance — 40, 60, 80, 100 yards. 3 balls per distance. Note your clock position next to the distance in Grint notes. This becomes your on-course distance matrix.'],
+      ['drill','15–30 min','Harmon Lead-Arm Release','Chip 10 balls to the 40-yard flag with only your lead arm. Feel the arm extending toward the target rather than collapsing. Then hit 10 normal chips recreating that extension feeling.'],
+      ['drill','30–45 min','Ladder Drill: 40–60–80–100','One ball to each flag in order. Then reverse: 100–80–60–40. Go up and back 3 times. This is speed/distance feel training — the same thing tour pros do to dial in yardages before a round.'],
+      ['course','45–60 min','Up-and-Down Pressure Game','Drop balls at 5 different lies around a green (rough, tight, slope, uphill, behind pin). Chip and putt. Track: how many up-and-downs out of 5. Write it down. Tour average is 4/5. Target: 3/5 by trip day.']
+    ]
+  },
+  {
+    name: 'Wedge Session — 50 / 70 / 90 Yards',
+    tag: 'Short Game · Alternate Distances',
+    distances: [50, 70, 90],
+    drills: [
+      ['drill','0–15 min','Pelz Clock System — Alternate Set','Same clock system, now at 50, 70, and 90 yards. These off-number distances are where amateurs struggle most — they fall between "full" and "half" wedge. Map your clock positions for these distances in Grint notes.'],
+      ['drill','15–30 min','Tee Behind the Ball Drill','Place a tee 2 inches behind your ball. Hit the ball without touching the tee. Forces ball-first contact — eliminates the chunk. 20 clean contacts with SW. If you hit the tee, reset and go again. Streak of 15 clean = you own it.'],
+      ['drill','30–45 min','Ladder: 50–70–90','One ball to each yardage marker in order. Reverse: 90–70–50. 3 full up-and-backs. Focus on landing zone, not carry total — pick a spot on the green and land it there.'],
+      ['course','45–60 min','Random Lie Challenge','Drop 5 balls in genuinely bad spots: tight lie, downhill lie, rough, below your feet, plugged. One shot each. Full routine. This simulates what happens every round — no perfect lies. Score yourself: how many finish within 10 feet of the flag.']
+    ]
+  }
+];
+
+// PUTTING sessions
+const puttSessions = [
+  {
+    name: 'Putting Lab — Mechanics & Short Putts',
+    tag: 'Putting · Phase 1',
+    blocks: [
+      ['focus','0–5 min','Gate Drill — Stroke Mechanics','Two tees just wider than your putter head. Stroke through the gate 20 times without clipping a tee. Shoulders-only pendulum stroke, hands passive. Don\'t look up until after contact. This is how you build repeatable face control.'],
+      ['focus','5–20 min','Circle of Eight — 3 Feet','8 balls in a circle at 3 feet. Make all 8 in a row or start over. Tour pros make 95% of 3-footers. You\'re probably around 80%. Every percentage point here is a stroke per round. Note how many attempts it takes to complete the circle.'],
+      ['focus','20–35 min','Lag Ladder — Distance Control','3 balls from 20, 30, and 40 feet. Goal: stop each ball within a 3-foot circle around the hole. Count how many land inside. Pelz: most mid-handicapper 3-putts happen because the first putt is 6+ feet away — not because the second is missed.'],
+      ['focus','35–45 min','Bottom-Hand Drill','Stroke 10 short putts with trail hand only. Feel the smooth release through the ball. Then replace lead hand and stroke 10 more with that same release feeling. Eliminates the rigid wrists that cause skipping and jumping rolls.']
+    ]
+  },
+  {
+    name: 'Putting Lab — Distance & Pressure',
+    tag: 'Putting · Escalating',
+    blocks: [
+      ['focus','0–5 min','Gate Drill','20 clean strokes through the gate. Non-negotiable opener every putting session.'],
+      ['focus','5–20 min','Extended Lag — 50 Feet','4 balls from 50 feet. Can you 2-putt from Tour distance? Focus on leaving every putt on the uphill side of the hole. Pelz and Mickelson: 80% of missed short putts come from downhill tap-ins. Train to leave yourself uphill.'],
+      ['focus','20–35 min','Circle of Eight — 4 Feet','Harder version. Same rules: all 8 or restart. When you can do 4 feet consistently, you\'ve effectively eliminated the dreaded "knee-knocker" from your scorecard.'],
+      ['focus','35–45 min','Random Distance / Random Read','Drop 5 balls at completely random positions on the green. Different distances, different reads, different slopes. Full routine on every putt — read the putt, practice stroke, step in, go. One putt, one chance. Score: how many land inside 3 feet of the hole.']
+    ]
+  }
+];
+
+// ROUND content
+function roundContent(roundNum, isNine, weekNum) {
+  const phase = weekNum <= 3 ? 1 : weekNum <= 7 ? 2 : 3;
+  if (isNine) {
+    const focuses = [
+      'Putting Focus: Count only putts today. Goal: under 15 putts for 9 holes. On every green, fully read the putt before stepping in — treat each one like it\'s for a match.',
+      'Driving Focus: Track every fairway hit. Note your miss direction — left or right — on every missed fairway. This single-hole data feeds directly back to your next range session.',
+      'Short Game Focus: Track every up-and-down attempt and whether you converted it. Note which types of chips you struggled with. That\'s your next chip/wedge session\'s agenda.',
+      'Routine Focus: Full pre-shot routine on every single shot — drives, irons, chips, putts. No exceptions. The goal isn\'t score — it\'s making the routine automatic before your next full round.',
+      'Course Management: Play every tee shot to a specific target. Before every approach, play to the fat of the green. Track penalty strokes only. Goal: zero penalties on 9 holes.'
+    ];
+    const focusIdx = Math.min(roundNum - 1, focuses.length - 1);
+    return `
+    <div class="m-block course">
+      <div class="m-block-label">9-Hole Round · Week ${weekNum}</div>
+      <div class="m-block-title">Solo or Twilight Round</div>
+      <div class="m-block-body">
+        <p style="margin-bottom:12px">Today's single focus — don't try to track everything:</p>
+        <p><strong>${focuses[focusIdx]}</strong></p>
+        <div class="m-divider"></div>
+        <p>After the round, note 2 observations in Grint <em>before you leave the parking lot.</em> Memory fades fast. What pattern did you notice? What do you bring to the next session?</p>
+      </div>
+    </div>`;
+  }
+
+  const roundFocuses = [
+    { title: 'The Diagnostic Round', body: 'Play your normal game. Your job: track fairways hit, greens in regulation, and putts per hole in Grint. After the round, calculate your 3-putt percentage and GIR%. These two numbers map where your strokes are going. Don\'t worry about score — this round builds your baseline.' },
+    { title: 'The Routine Round', body: 'Score doesn\'t matter today. One thing matters: full pre-shot routine on every single shot. Read, visualize, step in, trigger, swing. No exceptions — not even tap-in putts. If you break your routine once, note it and reset. Harmon: the routine is your anchor under pressure. By trip day it must be automatic.' },
+    { title: 'The Course Management Round', body: 'Before every tee shot, identify: where does my miss need to be? Play to the fat of every green — not the pin. On par-5s, drive to your favorite wedge yardage, not for distance. Harmon\'s rule: a smart bogey beats a double from a hero shot every time. Track penalty strokes separately. Goal: zero.' },
+    { title: 'The Pressure Round', body: 'Play to score. Full routine, smart management, and the physical work in the background doing its job. Compare your Grint stats to your diagnostic round. Fairways up? GIR up? Putts down? The score follows the stats — if the underlying numbers improved, you\'re on track.' },
+    { title: 'The Benchmark Round', body: 'This is your proof-of-work round. Full everything — routine, course management, pre-shot ritual. After: compare all 5 Grint stats to Round 1. Fairways hit %, GIR %, putts per round, up-and-down %, penalty strokes. The score will follow. Play free — you\'ve done the work.' }
+  ];
+  const rf = roundFocuses[Math.min(roundNum - 1, roundFocuses.length - 1)];
+  return `
+  <div class="m-block course">
+    <div class="m-block-label">Full Round · Round ${roundNum} of 5–6</div>
+    <div class="m-block-title">${rf.title}</div>
+    <div class="m-block-body">
+      <p style="margin-bottom:12px">${rf.body}</p>
+      <div class="m-divider"></div>
+      <p><strong>Track in Grint:</strong> Fairways Hit, GIR, Putts per Hole, Up-and-Down Attempts, Penalty Strokes.</p>
+    </div>
+  </div>`;
+}
+
+// ── BUILD SCHEDULE ──
+const schedule = [];
+let rangeSessionIdx = 0;
+let chipSessionIdx = 0;
+let puttSessionIdx = 0;
+let fullRoundNum = 0;
+let nineRoundNum = 0;
+
+for (let i = 0; i < 75; i++) {
+  const d = new Date(START);
+  d.setDate(START.getDate() + i);
+  const dow = d.getDay();
+  const weekNum = Math.floor(i / 7) + 1;
+  const phase = weekNum <= 3 ? 1 : weekNum <= 7 ? 2 : 3;
+  const isRoundSat = dow === 6 && weekNum % 2 === 1;
+
+  let type = 'rest';
+  let content = null;
+  let title = 'Rest Day';
+  let phaseStr = '';
+  let icon = '';
+
+  if (dow === 1) { type = 'gym-push'; title = 'Push Day'; icon = '🏋️'; phaseStr = ['Phase 1 · Foundation', 'Phase 2 · Development', 'Phase 3 · Power'][phase-1]; }
+  else if (dow === 3) { type = 'gym-pull'; title = 'Pull Day'; icon = '💪'; phaseStr = ['Phase 1 · Foundation', 'Phase 2 · Development', 'Phase 3 · Power'][phase-1]; }
+  else if (dow === 4) {
+    type = 'range';
+    title = rangeSessions[rangeSessionIdx % rangeSessions.length].name;
+    icon = '⛳';
+    phaseStr = ['Phase 1 · Foundation', 'Phase 2 · Development', 'Phase 3 · Peak'][phase-1];
+    rangeSessionIdx++;
+  }
+  else if (isRoundSat) {
+    type = 'round'; fullRoundNum++;
+    title = 'Full Round'; icon = '🏌️';
+    phaseStr = `Round ${fullRoundNum}`;
+  }
+  else if (dow === 6) { type = 'gym-full'; title = 'Full Body Day'; icon = '🏋️'; phaseStr = ['Phase 1 · Core & Legs', 'Phase 2 · Power', 'Phase 3 · Explosive'][phase-1]; }
+  else if (dow === 0 && weekNum % 2 === 1) {
+    type = 'chip'; icon = '🏌️';
+    const cs = chipSessions[chipSessionIdx % chipSessions.length];
+    title = cs.name; phaseStr = cs.tag;
+    chipSessionIdx++;
+  }
+  else if (dow === 0 && weekNum % 2 === 0) {
+    type = 'putt'; icon = '⛳';
+    const ps = puttSessions[puttSessionIdx % puttSessions.length];
+    title = ps.name; phaseStr = ps.tag;
+    puttSessionIdx++;
+  }
+
+  schedule.push({ i, date: d, dow, weekNum, phase, type, title, icon, phaseStr });
+}
+
+// Reset counters for rendering
+rangeSessionIdx = 0; chipSessionIdx = 0; puttSessionIdx = 0; fullRoundNum = 0; nineRoundNum = 0;
+let rangeCount = []; // track per-week range session count for 9-hole suggestion
+
+// Add 9-hole options on non-round Saturdays (they appear as optional note)
+// Actually encode them in the gym-full Saturday as an optional swap
+
+// ── RENDER CALENDAR ──
+const grid = document.getElementById('cal-grid');
+// Group into weeks (Sun–Sat)
+// First day is Thursday March 12. Build padded weeks.
+const allDays = [];
+// Padding before first day (Sun = 0, Mar 12 = Thursday = 4)
+const firstDow = schedule[0].date.getDay(); // should be 4 (Thu)
+for (let p = 0; p < firstDow; p++) allDays.push(null);
+schedule.forEach(d => allDays.push(d));
+// Pad to complete last week
+while (allDays.length % 7 !== 0) allDays.push(null);
+
+// Render week rows
+let weekRowCount = 0;
+for (let w = 0; w < allDays.length / 7; w++) {
+  const weekDays = allDays.slice(w*7, w*7+7);
+  const firstReal = weekDays.find(d => d !== null);
+  if (!firstReal) continue;
+  weekRowCount++;
+
+  const row = document.createElement('div');
+  row.className = 'week-row';
+
+  // Week number cell
+  const wc = document.createElement('div');
+  wc.className = 'week-num-cell';
+  wc.textContent = `W${firstReal.weekNum}`;
+  row.appendChild(wc);
+
+  weekDays.forEach(day => {
+    const cell = document.createElement('div');
+    if (!day) {
+      cell.className = 'day-cell rest';
+      row.appendChild(cell);
+      return;
+    }
+
+    const dateObj = day.date;
+    dateObj.setHours(0,0,0,0);
+    const isPast = dateObj < TODAY;
+    const isToday = dateObj.getTime() === TODAY.getTime();
+
+    cell.className = `day-cell ${day.type}${isPast ? ' past' : ''}${isToday ? ' today' : ''}`;
+
+    const dayNum = document.createElement('div');
+    dayNum.className = 'day-num';
+    dayNum.textContent = dateObj.getDate();
+    cell.appendChild(dayNum);
+
+    if (day.type !== 'rest') {
+      const lbl = document.createElement('div');
+      lbl.className = 'day-type-label';
+      const shortNames = {
+        'gym-push': 'Push', 'gym-pull': 'Pull', 'gym-full': 'Full Body',
+        'range': 'Range', 'round': 'Round', 'chip': 'Chip/Wedge',
+        'putt': 'Putting', 'nine': '9 Holes'
+      };
+      lbl.textContent = shortNames[day.type] || day.type;
+      cell.appendChild(lbl);
+
+      const ico = document.createElement('div');
+      ico.className = 'day-icon';
+      ico.textContent = day.icon;
+      cell.appendChild(ico);
+    }
+
+    if (isToday) {
+      const dot = document.createElement('div');
+      dot.className = 'today-dot';
+      cell.appendChild(dot);
+    }
+
+    if (day.type !== 'rest') {
+      cell.onclick = () => openDay(day);
+    }
+    row.appendChild(cell);
+  });
+
+  grid.appendChild(row);
+}
+
+// ── OPEN DAY MODAL ──
+let _rangeIdx = 0, _chipIdx = 0, _puttIdx = 0, _roundIdx = 0, _nineIdx = 0;
+// Pre-calculate indices for each day
+const dayIndices = {};
+let ri=0, ci=0, pi=0, fi=0, ni=0;
+schedule.forEach(day => {
+  if (day.type === 'range') { dayIndices[day.i] = {ri}; ri++; }
+  else if (day.type === 'chip') { dayIndices[day.i] = {ci}; ci++; }
+  else if (day.type === 'putt') { dayIndices[day.i] = {pi}; pi++; }
+  else if (day.type === 'round') { dayIndices[day.i] = {fi}; fi++; }
+  else if (day.type === 'nine') { dayIndices[day.i] = {ni}; ni++; }
+});
+
+function openDay(day) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dows = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  document.getElementById('m-date').textContent = `${dows[day.dow]}, ${months[day.date.getMonth()]} ${day.date.getDate()}, 2026 · Week ${day.weekNum}`;
+
+  const titles = { 'gym-push': '🏋️ Push Day', 'gym-pull': '💪 Pull Day', 'gym-full': '🏋️ Full Body Day', 'range': '⛳ Range Session', 'round': '🏌️ Full Round', 'chip': '🏌️ Chip & Wedge', 'putt': '⛳ Putting Lab', 'nine': '🏌️ 9-Hole Round' };
+  document.getElementById('m-title').textContent = titles[day.type] || day.title;
+  document.getElementById('m-phase').textContent = day.phaseStr;
+  document.getElementById('m-phase').style.color = day.phase === 1 ? 'var(--blue-light)' : day.phase === 2 ? 'var(--green-light)' : 'var(--gold-light)';
+
+  let html = '';
+  const idx = dayIndices[day.i] || {};
+
+  if (day.type === 'gym-push' || day.type === 'gym-pull' || day.type === 'gym-full') {
+    html = gymContent(day.phase, day.type, day.weekNum);
+    // Add 9-hole option on non-round Saturdays
+    if (day.type === 'gym-full') {
+      html += `<div class="m-block course" style="margin-top:4px"><div class="m-block-label">Optional</div><div class="m-block-title">9-Hole Option Today</div><div class="m-block-body">This is your off-round Saturday. If conditions are right, swap the gym session for a focused 9-hole round. Pick one focus: <strong>Putting</strong> (goal under 15 putts), <strong>Driving</strong> (track every fairway), or <strong>Short Game</strong> (count up-and-downs). Don't just play — have a purpose.</div></div>`;
+    }
+  } else if (day.type === 'range') {
+    const sess = rangeSessions[idx.ri % rangeSessions.length];
+    html += `<div class="m-block toptracer"><div class="m-block-label">${sess.tag}</div><div class="m-block-title">${sess.name}</div><div class="m-block-body">Session ${(idx.ri||0)+1} of your range program. Use Toptracer every session.</div></div>`;
+    sess.blocks.forEach(([btype, time, name, body]) => {
+      html += `<div class="m-block ${btype}"><div class="time-tag">${time}</div><div class="m-block-title">${name}</div><div class="m-block-body">${body}</div></div>`;
+    });
+  } else if (day.type === 'chip') {
+    const sess = chipSessions[idx.ci % chipSessions.length];
+    html += `<div class="m-block drill"><div class="m-block-label">${sess.tag}</div><div class="m-block-title">${sess.name}</div><div class="m-block-body">Focus distances today: <strong>${sess.distances.join(' · ')} yards</strong>. Every drill is tied to these yardages.</div></div>`;
+    sess.drills.forEach(([btype, time, name, body]) => {
+      html += `<div class="m-block ${btype}"><div class="time-tag">${time}</div><div class="m-block-title">${name}</div><div class="m-block-body">${body}</div></div>`;
+    });
+  } else if (day.type === 'putt') {
+    const sess = puttSessions[idx.pi % puttSessions.length];
+    html += `<div class="m-block focus"><div class="m-block-label">${sess.tag}</div><div class="m-block-title">${sess.name}</div><div class="m-block-body">45 min. Separated from chipping so you can give it full attention.</div></div>`;
+    sess.blocks.forEach(([btype, time, name, body]) => {
+      html += `<div class="m-block ${btype}"><div class="time-tag">${time}</div><div class="m-block-title">${name}</div><div class="m-block-body">${body}</div></div>`;
+    });
+  } else if (day.type === 'round') {
+    html = roundContent((idx.fi||0)+1, false, day.weekNum);
+  } else if (day.type === 'nine') {
+    html = roundContent((idx.ni||0)+1, true, day.weekNum);
+  }
+
+  document.getElementById('m-body').innerHTML = html;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('open');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('overlay')) closeOverlay();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+// ── TRACKING (localStorage) ──
+const STORAGE_KEY = 'golf75_v1';
+let currentDayKey = null;
+let saveTimer = null;
+
+function storageKey(day) {
+  return `d${day.i}`;
+}
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveData(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  catch(e) { console.warn('Storage unavailable', e); }
+}
+
+function updateProgress() {
+  const data = loadData();
+  const total = schedule.filter(d => d.type !== 'rest').length;
+  const done = Object.values(data).filter(v => v.done).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-count').textContent = `${done} / ${total} sessions`;
+}
+
+function applyDoneClasses() {
+  const data = loadData();
+  document.querySelectorAll('.day-cell').forEach(cell => {
+    const key = cell.dataset.dayKey;
+    if (!key) return;
+    if (data[key]?.done) cell.classList.add('done');
+    else cell.classList.remove('done');
+  });
+}
+
+function toggleDone() {
+  if (!currentDayKey) return;
+  const data = loadData();
+  const entry = data[currentDayKey] || {};
+  entry.done = !entry.done;
+  data[currentDayKey] = entry;
+  saveData(data);
+  const btn = document.getElementById('btn-done');
+  btn.classList.toggle('marked', entry.done);
+  btn.textContent = entry.done ? '✓ Completed' : '✓ Mark Complete';
+  applyDoneClasses();
+  updateProgress();
+}
+
+function saveNotes() {
+  if (!currentDayKey) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const data = loadData();
+    const entry = data[currentDayKey] || {};
+    entry.notes = document.getElementById('notes-field').value;
+    data[currentDayKey] = entry;
+    saveData(data);
+    const el = document.getElementById('notes-saved');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1800);
+  }, 600);
+}
+
+function clearDay() {
+  if (!currentDayKey) return;
+  if (!confirm('Clear completion and notes for this day?')) return;
+  const data = loadData();
+  delete data[currentDayKey];
+  saveData(data);
+  document.getElementById('btn-done').classList.remove('marked');
+  document.getElementById('btn-done').textContent = '✓ Mark Complete';
+  document.getElementById('notes-field').value = '';
+  applyDoneClasses();
+  updateProgress();
+}
+
+// Patch openDay to load stored state
+const _origOpenDay = openDay;
+window.openDay = function(day) {
+  _origOpenDay(day);
+  currentDayKey = storageKey(day);
+  const data = loadData();
+  const entry = data[currentDayKey] || {};
+  const btn = document.getElementById('btn-done');
+  btn.classList.toggle('marked', !!entry.done);
+  btn.textContent = entry.done ? '✓ Completed' : '✓ Mark Complete';
+  document.getElementById('notes-field').value = entry.notes || '';
+  document.getElementById('notes-saved').classList.remove('show');
+};
+
+// Patch closeOverlay to clear currentDayKey
+const _origClose = closeOverlay;
+window.closeOverlay = function() {
+  _origClose();
+  currentDayKey = null;
+};
+
+// Re-render cells to attach day keys — done via a small post-processing pass
+(function attachKeys() {
+  const cells = document.querySelectorAll('.day-cell:not(.rest)');
+  let si = 0;
+  cells.forEach(cell => {
+    // find next non-rest schedule entry
+    while (si < schedule.length && schedule[si].type === 'rest') si++;
+    if (si < schedule.length) {
+      cell.dataset.dayKey = storageKey(schedule[si]);
+      si++;
+    }
+  });
+  applyDoneClasses();
+  updateProgress();
+})();
+
+
+</script>
+</body>
+</html>
